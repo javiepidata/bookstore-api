@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+<spring:beans>
+    <spring:bean id="bookService" class="com.mule.support.service.BookService"/>
+    <spring:bean id="databaseClass" class="com.mule.support.database.DatabaseClass"/>
+</spring:beans>
+    <flow name="getBooksFlow">
+        <logger message="User #[message.inboundProperties['User']] requesting books" level="INFO" doc:name="Logger"/>
+        <set-variable variableName="query" value="#[message.inboundProperties.'http.query.params'.title]" doc:name="query parameter"/>
+        <choice doc:name="Choice">
+            <when expression="#[flowVars.query != null]">
+                <flow-ref name="getBookByNameSub_Flow" doc:name="getBookByNameSub_Flow"/>
+            </when>
+            <otherwise>
+                <invoke name="getAllBooks" object-ref="bookService" method="getAllBooks"/>
+            </otherwise>
+        </choice>
+    </flow>
+    <sub-flow name="getBookByNameSub_Flow">
+        <invoke name="getBookByName" object-ref="bookService" method="getBookByName" methodArguments="#[flowVars.query]" methodArgumentTypes="java.lang.String"/>
+        <choice doc:name="Choice">
+            <when expression="#[payload == null]">
+                <set-payload value="{&quot;message&quot;: &quot;No Book found.&quot;}" doc:name="Book Not Found"/>
+            </when>
+            <otherwise>
+                <json:object-to-json-transformer doc:name="Object to JSON"/>
+            </otherwise>
+        </choice>
+    </sub-flow>
+    <flow name="addBookFlow">
+        <logger message="User #[message.inboundProperties['User']] is trying to create a book" level="INFO" doc:name="Logger"/>
+        <json:json-to-object-transformer doc:name="JSON to Object" returnClass="com.mule.support.model.Book"/>
+        <invoke name="addBook" object-ref="bookService" method="addBook" methodArgumentTypes="com.mule.support.model.Book" methodArguments="#[payload]"/>
+        <set-property propertyName="http.status" value="201" doc:name="Created"/>
+    </flow>
+    <flow name="updateBookFlow">
+        <logger message="User #[message.inboundProperties['User']] is trying to update a book" level="INFO" doc:name="Logger"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="fbcf5295-c869-4d15-afe9-87e1dc557773">
+            <dw:input-payload mimeType="application/json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+	author: payload.author,
+	id: flowVars.id,
+	pages: payload.pages,
+	title: payload.title
+} as :object {
+	class : "com.mule.support.model.Book"
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <invoke name="updateBook" object-ref="bookService" method="updateBook" methodArguments="#[payload]" methodArgumentTypes="com.mule.support.model.Book"/>
+    </flow>
+    <flow name="deleteBookFlow">
+        <logger message="User #[message.inboundProperties['User']] is trying to delete a book" level="INFO" doc:name="Logger"/>
+        <invoke name="deleteBook" object-ref="bookService" method="deleteBook" methodArguments="#[flowVars.id]" methodArgumentTypes="java.lang.String"/>
+    </flow>
+    <flow name="getBookByIdFlow">
+        <logger message="User #[message.inboundProperties['User']] is trying to get a book" level="INFO" doc:name="Logger"/>
+        <invoke name="getBookById" object-ref="bookService" method="getBookById" methodArguments="#[flowVars.id]" methodArgumentTypes="java.lang.String"/>
+    </flow>
+</mule>
