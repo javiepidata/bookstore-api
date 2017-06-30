@@ -8,15 +8,15 @@ import com.mule.support.model.Book;
 public class DatabaseClass {
 	
 	private static Map<Integer, Book> books = new HashMap<>();
-	public static Integer NEXT_ID = 0;
+	public static Integer NEXT_ID = 1;
 	
 	public static Map<Integer, Book> getBooks(){
-		Book book1 = createBook(NEXT_ID++, "Roberto Fontanarrosa", "El mundo ha vivido equivocado", 347);
-		Book book2 = createBook(NEXT_ID++, "Eduardo Mendoza", "Sin noticias de Gurb", 426);
-		Book book3 = createBook(NEXT_ID++, "John Kennedy Toole", "La conjura de los necios", 538);
+		Book book1 = createBook(NEXT_ID++, "John Kennedy Toole", "La conjura de los necios", 344);
+		Book book2 = createBook(NEXT_ID++, "Eduardo Mendoza", "Sin noticias de Gurb", 523);
+		Book book3 = createBook(NEXT_ID++, "Roberto Fontanarrosa", "El mundo ha vivido equivocado", 343);
 		books.put(book1.getId(), book1);
 		books.put(book2.getId(), book2);
-		books.put(book3.getId(), book3 );
+		books.put(book3.getId(), book3);
 		return books;
 	}
 	

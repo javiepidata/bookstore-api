@@ -68,5 +68,6 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <flow name="getBookByIdFlow">
         <logger message="User #[message.inboundProperties['User']] is trying to get a book" level="INFO" doc:name="Logger"/>
         <invoke name="getBookById" object-ref="bookService" method="getBookById" methodArguments="#[flowVars.id]" methodArgumentTypes="java.lang.String"/>
+        <set-property propertyName="http.status" value="200" doc:name="200 Ok"/>
     </flow>
 </mule>
