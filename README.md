@@ -14,34 +14,32 @@ Send a GET request to http://localhost:8081/api/books, You should receive a resp
 
 Send a POST to http://localhost:8081/api/books with the body equals to
 
-```
+```json
     {
         "title": "Logica",
         "author": "Aristoteles",
         "pages": 545
     }
 ```
-
 You should receive a response with the book data and status code 201.
-
-```{
-    "title": "Logica",
-    "author": "Aristoteles",
-    "pages": 545,
-    "id": 4
-}
+```json
+    {
+        "title": "Logica",
+        "author": "Aristoteles",
+        "pages": 545,
+        "id": 4
+    }
 ```
-
 Send a PUT request to http://localhost:8081/api/books/4 with the body equals to
 
-```{
-    "title": "Metafisica",
-    "author": "Aristoteles",
-    "pages": 628,
-    "id": 4
-}
+```json
+    {
+        "title": "Metafisica",
+        "author": "Aristoteles",
+        "pages": 628,
+        "id": 4
+    }
 ```
-
 You should receive a response with status code 200 ok.
 
 Send a GET request to http://localhost:8081/api/books?title=Metafisica
