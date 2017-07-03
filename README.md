@@ -46,7 +46,7 @@ You should receive a response with status code 200 ok.
 Send a DELETE request to http://localhost:8081/api/books/4
 You should receive a response with status code 204.
 
-##Exception Strategy Mappings
+## Exception Strategy Mappings
 Studio automatically generates several global exception strategy mappings that the Main flow references to send error responses in HTTP-status-code-friendly format.
 The project also has one additional exception strategy defined for the error code 409
  
